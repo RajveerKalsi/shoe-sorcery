@@ -27,3 +27,30 @@ export type FilterOptions = {
   colors?: string[];
   sizes?: number[];
 };
+
+export interface Order {
+  id: string;
+  userId: string;
+  items: CartItem[];
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  total: number;
+  shippingAddress: ShippingAddress;
+  createdAt: string;
+}
+
+export interface ShippingAddress {
+  name: string;
+  email: string;
+  street: string;
+  city: string;
+  state: string;
+  postalCode: string;
+  country: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'user' | 'admin';
+}
