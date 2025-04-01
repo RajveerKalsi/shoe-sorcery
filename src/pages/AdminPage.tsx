@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Order, Product } from "@/types";
+import { Order, Product, ProductFormValues } from "@/types";
 import { products as initialProducts } from "@/data/products";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -66,12 +66,10 @@ const productSchema = z.object({
     errorMap: () => ({ message: "Please select a valid category" }),
   }),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  sizes: z.string().transform(val => val.split(",").map(size => parseFloat(size.trim())).filter(size => !isNaN(size))),
-  colors: z.string().transform(val => val.split(",").map(color => color.trim())),
-  images: z.string().transform(val => val.split(",").map(url => url.trim()))
+  sizes: z.string().min(1, "At least one size is required"),
+  colors: z.string().min(1, "At least one color is required"),
+  images: z.string().min(1, "At least one image URL is required")
 });
-
-type ProductFormValues = z.infer<typeof productSchema>;
 
 const AdminPage = () => {
   const { user, isAdmin, logout } = useAuth();
@@ -137,6 +135,22 @@ const AdminPage = () => {
   }, [editingProductId, products, form]);
 
   const onSubmit = (values: ProductFormValues) => {
+    // Parse the comma-separated strings into arrays
+    const parsedSizes = values.sizes
+      .split(",")
+      .map(size => parseFloat(size.trim()))
+      .filter(size => !isNaN(size));
+      
+    const parsedColors = values.colors
+      .split(",")
+      .map(color => color.trim())
+      .filter(color => !!color);
+      
+    const parsedImages = values.images
+      .split(",")
+      .map(url => url.trim())
+      .filter(url => !!url);
+
     if (editingProductId) {
       // Update existing product
       setProducts(products.map(product => 
@@ -147,9 +161,9 @@ const AdminPage = () => {
               price: values.price,
               category: values.category,
               description: values.description,
-              sizes: values.sizes,
-              colors: values.colors,
-              images: values.images
+              sizes: parsedSizes,
+              colors: parsedColors,
+              images: parsedImages
             } 
           : product
       ));
@@ -163,9 +177,9 @@ const AdminPage = () => {
         price: values.price,
         category: values.category,
         description: values.description,
-        sizes: values.sizes,
-        colors: values.colors,
-        images: values.images
+        sizes: parsedSizes,
+        colors: parsedColors,
+        images: parsedImages
       };
       
       setProducts([...products, newProduct]);

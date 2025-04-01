@@ -1,4 +1,3 @@
-
 export interface Product {
   id: number;
   name: string;
@@ -53,4 +52,14 @@ export interface User {
   email: string;
   name: string;
   role: 'user' | 'admin';
+}
+
+export interface ProductFormValues {
+  name: string;
+  price: number;
+  category: 'running' | 'casual' | 'athletic' | 'formal';
+  description: string;
+  sizes: string; // Store as comma-separated string for form
+  colors: string; // Store as comma-separated string for form
+  images: string; // Store as comma-separated string for form
 }
